@@ -1,6 +1,21 @@
 steps:
-- name: 'docker/compose:latest'
+  - name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg'
+  - 'version=1.16.1'
+  - '-t'
+  - 'gcr.io/$PROJECT_ID/docker-compose:latest'
+  - '-t'
+  - 'gcr.io/$PROJECT_ID/docker-compose:1.16.1'
+  - '.'
+- name: 'gcr.io/$PROJECT_ID/docker-compose'
+  args: ['version']
+images:
+- 'gcr.io/$PROJECT_ID/docker-compose:latest'
+- 'gcr.io/$PROJECT_ID/docker-compose:1.16.1'
+- name: 'gcr.io/$PROJECT_ID/docker-compose:latest'
   args: ['up', '-d']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['tag', 'vue-storefront:latest', 'gcr.io/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA']
+  args: ['tag', 'divante/vue-storefront:latest', 'gcr.io/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA']
 images: ['gcr.io/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA']
