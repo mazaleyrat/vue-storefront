@@ -4,7 +4,7 @@ ENV VS_ENV dev
 
 WORKDIR /var/www
 
-COPY package.json ./
+COPY ./ /var/www/
 
 RUN apk add --no-cache --virtual .build-deps ca-certificates wget git \
   && yarn install --no-cache \
