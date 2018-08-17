@@ -4,11 +4,15 @@ const express = require('express')
 const rootPath = require('app-root-path').path
 const resolve = file => path.resolve(rootPath, file)
 const config = require('config')
+const cors = require('cors')
 
 const isProd = process.env.NODE_ENV === 'production'
 process.noDeprecation = true
 
 const app = express()
+
+app.use(cors());
+app.options('*', cors());
 
 let renderer
 if (isProd) {
