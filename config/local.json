@@ -5,7 +5,7 @@
   },
   "elasticsearch": {
     "httpAuth": "",
-    "host": "http://192.168.64.6:31204/api/catalog",
+    "host": "http://lebonflacon-api.default.svc.cluster.local:8080/api/catalog",
     "index": "vue_storefront_catalog"
   },
   "ssr": {
@@ -25,7 +25,7 @@
       "name": "German Store",
       "url": "/de",
       "elasticsearch": {
-        "host": "192.168.64.6:31204/api/catalog",
+        "host": "lebonflacon-api.default.svc.cluster.local:8080/api/catalog",
         "index": "vue_storefront_catalog_de"
       },
       "tax": {
@@ -52,7 +52,7 @@
       "name": "Italian Store",
       "url": "/it",
       "elasticsearch": {
-        "host": "192.168.64.6:31204/api/catalog",
+        "host": "lebonflacon-api.default.svc.cluster.local:8080/api/catalog",
         "index": "vue_storefront_catalog_it"
       },
       "tax": {
@@ -209,17 +209,17 @@
     "synchronize_totals": true,
     "setCustomProductOptions": true,
     "setConfigurableProductOptions": true,
-    "create_endpoint": "http://192.168.64.6:31204/api/cart/create?token={{token}}",
-    "updateitem_endpoint": "http://192.168.64.6:31204/api/cart/update?token={{token}}&cartId={{cartId}}",
-    "deleteitem_endpoint": "http://192.168.64.6:31204/api/cart/delete?token={{token}}&cartId={{cartId}}",
-    "pull_endpoint": "http://192.168.64.6:31204/api/cart/pull?token={{token}}&cartId={{cartId}}",
-    "totals_endpoint": "http://192.168.64.6:31204/api/cart/totals?token={{token}}&cartId={{cartId}}",
-    "paymentmethods_endpoint": "http://192.168.64.6:31204/api/cart/payment-methods?token={{token}}&cartId={{cartId}}",
-    "shippingmethods_endpoint": "http://192.168.64.6:31204/api/cart/shipping-methods?token={{token}}&cartId={{cartId}}",
-    "shippinginfo_endpoint": "http://192.168.64.6:31204/api/cart/shipping-information?token={{token}}&cartId={{cartId}}",
-    "collecttotals_endpoint": "http://192.168.64.6:31204/api/cart/collect-totals?token={{token}}&cartId={{cartId}}",
-    "deletecoupon_endpoint": "http://192.168.64.6:31204/api/cart/delete-coupon?token={{token}}&cartId={{cartId}}",
-    "applycoupon_endpoint": "http://192.168.64.6:31204/api/cart/apply-coupon?token={{token}}&cartId={{cartId}}"
+    "create_endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/cart/create?token={{token}}",
+    "updateitem_endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/cart/update?token={{token}}&cartId={{cartId}}",
+    "deleteitem_endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/cart/delete?token={{token}}&cartId={{cartId}}",
+    "pull_endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/cart/pull?token={{token}}&cartId={{cartId}}",
+    "totals_endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/cart/totals?token={{token}}&cartId={{cartId}}",
+    "paymentmethods_endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/cart/payment-methods?token={{token}}&cartId={{cartId}}",
+    "shippingmethods_endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/cart/shipping-methods?token={{token}}&cartId={{cartId}}",
+    "shippinginfo_endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/cart/shipping-information?token={{token}}&cartId={{cartId}}",
+    "collecttotals_endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/cart/collect-totals?token={{token}}&cartId={{cartId}}",
+    "deletecoupon_endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/cart/delete-coupon?token={{token}}&cartId={{cartId}}",
+    "applycoupon_endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/cart/apply-coupon?token={{token}}&cartId={{cartId}}"
   },
   "products": {
     "useShortCatalogUrls": false,
@@ -234,7 +234,7 @@
     "clearPricesBeforePlatformSync": false,
     "waitForPlatformSync": false,
     "setupVariantByAttributeCode": true,
-    "endpoint": "http://192.168.64.6:31204/api/product",
+    "endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/product",
     "defaultFilters": [
       "color",
       "size",
@@ -248,7 +248,7 @@
     "galleryVariantsGroupAttribute": "color"
   },
   "orders": {
-    "endpoint": "http://192.168.64.6:31204/api/order",
+    "endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/order",
     "payment_methods_mapping": {},
     "offline_orders": {
       "notification": {
@@ -279,22 +279,22 @@
   },
   "users": {
     "autoRefreshTokens": true,
-    "endpoint": "http://192.168.64.6:31204/api/user",
-    "history_endpoint": "http://192.168.64.6:31204/api/user/order-history?token={{token}}",
-    "resetPassword_endpoint": "http://192.168.64.6:31204/api/user/resetPassword",
-    "changePassword_endpoint": "http://192.168.64.6:31204/api/user/changePassword?token={{token}}",
-    "login_endpoint": "http://192.168.64.6:31204/api/user/login",
-    "create_endpoint": "http://192.168.64.6:31204/api/user/create",
-    "me_endpoint": "http://192.168.64.6:31204/api/user/me?token={{token}}",
-    "refresh_endpoint": "http://192.168.64.6:31204/api/user/refresh"
+    "endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/user",
+    "history_endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/user/order-history?token={{token}}",
+    "resetPassword_endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/user/resetPassword",
+    "changePassword_endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/user/changePassword?token={{token}}",
+    "login_endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/user/login",
+    "create_endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/user/create",
+    "me_endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/user/me?token={{token}}",
+    "refresh_endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/user/refresh"
   },
   "stock": {
     "synchronize": true,
     "allowOutOfStockInCart": true,
-    "endpoint": "http://192.168.64.6:31204/api/stock"
+    "endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/stock"
   },
   "images": {
-    "baseUrl": "http://192.168.64.6:31204/img/",
+    "baseUrl": "http://lebonflacon-api.default.svc.cluster.local:8080/img/",
     "productPlaceholder": "/assets/placeholder.jpg"
   },
   "install": {
@@ -331,7 +331,7 @@
     "fullLanguageName": "English"
   },
   "mailchimp": {
-    "endpoint": "http://192.168.64.6:31204/api/ext/mailchimp-subscribe/subscribe"
+    "endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/ext/mailchimp-subscribe/subscribe"
   },
   "theme": "@vue-storefront/theme-default",
   "analytics": {
@@ -341,7 +341,7 @@
     "api_key": "my_example_api_key"
   },
   "cms": {
-    "endpoint": "http://192.168.64.6:31204/api/ext/cms-data/cms{{type}}/{{cmsId}}",
-    "endpointIdentifier": "http://192.168.64.6:31204/api/ext/cms-data/cms{{type}}Identifier/{{cmsIdentifier}}/storeId/{{storeId}}"
+    "endpoint": "http://lebonflacon-api.default.svc.cluster.local:8080/api/ext/cms-data/cms{{type}}/{{cmsId}}",
+    "endpointIdentifier": "http://lebonflacon-api.default.svc.cluster.local:8080/api/ext/cms-data/cms{{type}}Identifier/{{cmsIdentifier}}/storeId/{{storeId}}"
   }
 }
