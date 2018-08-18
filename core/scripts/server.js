@@ -53,7 +53,7 @@ app.use('/dist', serve('dist', true))
 app.use('/assets', serve(themeRoot + '/assets', true))
 app.use('/assets', serve('core/assets', true))
 app.use('/service-worker.js', serve('dist/service-worker.js', {
-  setHeaders: {'Content-Type': 'text/javascript; charset=UTF-8'}
+  setHeaders: {'Content-Type': 'application/javascript; charset=UTF-8'}
 }))
 
 app.get('*', (req, res) => {
