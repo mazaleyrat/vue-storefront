@@ -24,6 +24,12 @@ function search (elasticQuery) {
   if (!url.startsWith('http')) {
     url = 'http://' + url
   }
+
+  _http.get(url, (res) => {}).on('error', (e) => {
+  console.error(e);
+  url = storeView.elasticsearch.hostinternal
+  });
+
   const httpQuery = {
     'size': elasticQuery.size,
     'from': elasticQuery.from,
@@ -45,6 +51,8 @@ function search (elasticQuery) {
 
   url = url + '/' + encodeURIComponent(elasticQuery.index) + '/' + encodeURIComponent(elasticQuery.type) + '/_search'
   url = url + '?' + buildURLQuery(httpQuery)
+
+
 
   return fetch(url, { method: 'POST',
     mode: 'cors',

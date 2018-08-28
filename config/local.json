@@ -5,7 +5,8 @@
   },
   "elasticsearch": {
     "httpAuth": "",
-    "host": "api.lebonflacon.com/api/catalog",
+    "host": "http://api.lebonflacon.com/api/catalog",
+    "hostinternal": "http://lebonflacon-api.default.svc.cluster.local:8080/api/catalog",
     "index": "vue_storefront_catalog"
   },
   "ssr": {
@@ -25,7 +26,8 @@
       "name": "German Store",
       "url": "/de",
       "elasticsearch": {
-        "host": "lebonflacon-api.default.svc.cluster.local:8080/api/catalog",
+        "host": "http://api.lebonflacon.com/api/catalog",
+        "hostinternal": "http://lebonflacon-api.default.svc.cluster.local:8080/api/catalog",
         "index": "vue_storefront_catalog_de"
       },
       "tax": {
@@ -52,7 +54,8 @@
       "name": "Italian Store",
       "url": "/it",
       "elasticsearch": {
-        "host": "lebonflacon-api.default.svc.cluster.local:8080/api/catalog",
+        "host": "http://api.lebonflacon.com/api/catalog",
+        "hostinternal": "http://lebonflacon-api.default.svc.cluster.local:8080/api/catalog",
         "index": "vue_storefront_catalog_it"
       },
       "tax": {
