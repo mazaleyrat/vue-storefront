@@ -4,6 +4,7 @@ import { currentStoreView } from './multistore'
 import hash from 'object-hash'
 import config from 'config'
 import fetch from 'isomorphic-fetch'
+import https from 'https'
 
 function isOnline () {
   if (typeof navigator !== 'undefined') {
@@ -25,10 +26,10 @@ function search (elasticQuery) {
     url = 'http://' + url
   }
 
-  _http.get(url, (res) => {}).on('error', (e) => {
-  console.error(e);
-  url = storeView.elasticsearch.hostinternal
-  });
+  https.get(url).on('error', (e) => {
+    console.error(e)
+    url = storeView.elasticsearch.hostinternal
+  })
 
   const httpQuery = {
     'size': elasticQuery.size,
@@ -51,8 +52,6 @@ function search (elasticQuery) {
 
   url = url + '/' + encodeURIComponent(elasticQuery.index) + '/' + encodeURIComponent(elasticQuery.type) + '/_search'
   url = url + '?' + buildURLQuery(httpQuery)
-
-
 
   return fetch(url, { method: 'POST',
     mode: 'cors',
