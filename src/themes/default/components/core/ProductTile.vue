@@ -1,101 +1,136 @@
 <template>
-  <div
-    class="product align-center w-100 pb20"
-    v-observe-visibility="visibilityChanged"
-  >
+  <div class="product align-center w-100 pb20" v-observe-visibility="visibilityChanged">
+    <div class="product__icons">
+      <AddToWishlist :product="product">
+        <div
+          class="product__icon"
+          :class="{'product__icon--active': isOnWishlist }"
+          :title="isOnWishlist ? $t('Remove') : $t('Add to favorite') "
+        >
+          <i class="material-icons">{{ favoriteIcon }}</i>
+        </div>
+      </AddToWishlist>
+      <AddToCompare :product="product">
+        <div
+          class="product__icon"
+          :class="{'product__icon--active':isOnCompare } "
+          :title="isOnCompare ? $t('Remove from compare') : $t('Add to compare')"
+        >
+          <i class="material-icons">compare</i>
+        </div>
+      </AddToCompare>
+    </div>
     <router-link
       class="block no-underline product-link"
-      :to="localizedRoute({
-        name: product.type_id + '-product',
-        params: {
-          parentSku: product.parentSku ? product.parentSku : product.sku,
-          slug: product.slug,
-          childSku: product.sku
-        }
-      })"
+      :to="productLink"
       data-testid="productLink"
     >
       <div
-        class="product-image relative bg-cl-secondary"
-        :class="[{ sale: labelsActive && isOnSale }, { new: labelsActive && isNew }]">
-        <img
-          :alt="product.name"
-          :src="thumbnailObj.loading"
-          v-lazy="thumbnailObj"
-          height="300"
-          width="310"
+        class="product-cover bg-cl-secondary"
+        :class="[{ sale: labelsActive && isOnSale }, { new: labelsActive && isNew }]"
+      >
+        <product-image
+          class="product-cover__thumb"
+          :image="thumbnailObj"
+          :alt="product.name | htmlDecode"
+          :calc-ratio="false"
           data-testid="productImage"
-        >
+        />
       </div>
 
-      <p class="mb0 cl-accent mt10">
+      <p class="mb0 cl-accent mt10" v-if="!onlyImage">
         {{ product.name | htmlDecode }}
       </p>
 
       <span
         class="price-original mr5 lh30 cl-secondary"
-        v-if="product.special_price && parseFloat(product.originalPriceInclTax) > 0"
-      >
-        {{ product.originalPriceInclTax | price }}
-      </span>
+        v-if="product.special_price && parseFloat(product.original_price_incl_tax) > 0 && !onlyImage"
+      >{{ product.original_price_incl_tax | price }}</span>
 
       <span
         class="price-special lh30 cl-accent weight-700"
-        v-if="product.special_price && parseFloat(product.special_price) > 0"
-      >
-        {{ product.priceInclTax | price }}
-      </span>
+        v-if="product.special_price && parseFloat(product.special_price) > 0 && !onlyImage"
+      >{{ product.price_incl_tax | price }}</span>
 
       <span
         class="lh30 cl-secondary"
-        v-if="!product.special_price && parseFloat(product.priceInclTax) > 0"
-      >
-        {{ product.priceInclTax | price }}
-      </span>
+        v-if="!product.special_price && parseFloat(product.price_incl_tax) > 0 && !onlyImage"
+      >{{ product.price_incl_tax | price }}</span>
     </router-link>
   </div>
 </template>
 
 <script>
+import rootStore from '@vue-storefront/core/store'
+import { ProductTile } from '@vue-storefront/core/modules/catalog/components/ProductTile.ts'
 import config from 'config'
-import rootStore from '@vue-storefront/store'
-import ProductTile from 'core/components/ProductTile'
+import ProductImage from './ProductImage'
+import AddToWishlist from 'theme/components/core/blocks/Wishlist/AddToWishlist'
+import AddToCompare from 'theme/components/core/blocks/Compare/AddToCompare'
+import { IsOnWishlist } from '@vue-storefront/core/modules/wishlist/components/IsOnWishlist'
+import { IsOnCompare } from '@vue-storefront/core/modules/compare/components/IsOnCompare'
 
 export default {
-  mixins: [ProductTile],
+  mixins: [ProductTile, IsOnWishlist, IsOnCompare],
+  components: {
+    ProductImage,
+    AddToWishlist,
+    AddToCompare
+  },
   props: {
     labelsActive: {
       type: Boolean,
-      requred: false,
       default: true
+    },
+    onlyImage: {
+      type: Boolean,
+      default: false
+    }
+  },
+  computed: {
+    thumbnailObj () {
+      return {
+        src: this.thumbnail,
+        loading: this.thumbnail
+      }
+    },
+    favoriteIcon () {
+      return this.isOnWishlist ? 'favorite' : 'favorite_border'
     }
   },
   methods: {
+    onProductPriceUpdate (product) {
+      if (product.sku === this.product.sku) {
+        Object.assign(this.product, product)
+      }
+    },
     visibilityChanged (isVisible, entry) {
-      if (isVisible) {
-        if (config.products.configurableChildrenStockPrefetchDynamic && config.products.filterUnavailableVariants) {
-          const skus = [this.product.sku]
-          if (this.product.type_id === 'configurable' && this.product.configurable_children && this.product.configurable_children.length > 0) {
-            for (const confChild of this.product.configurable_children) {
-              const cachedItem = rootStore.state.stock.cache[confChild.id]
-              if (typeof cachedItem === 'undefined' || cachedItem === null) {
-                skus.push(confChild.sku)
-              }
-            }
-            if (skus.length > 0) {
-              rootStore.dispatch('stock/list', { skus: skus }) // store it in the cache
-            }
+      if (
+        isVisible &&
+        config.products.configurableChildrenStockPrefetchDynamic &&
+        config.products.filterUnavailableVariants &&
+        this.product.type_id === 'configurable' &&
+        this.product.configurable_children &&
+        this.product.configurable_children.length > 0
+      ) {
+        const skus = [this.product.sku]
+        for (const confChild of this.product.configurable_children) {
+          const cachedItem = rootStore.state.stock.cache[confChild.id]
+          if (typeof cachedItem === 'undefined' || cachedItem === null) {
+            skus.push(confChild.sku)
           }
+        }
+        if (skus.length > 0) {
+          rootStore.dispatch('stock/list', { skus: skus }) // store it in the cache
         }
       }
     }
   },
-  created () {
-    this.$bus.$on('product-after-priceupdate', (product) => {
-      if (product.sku === this.product.sku) {
-        Object.assign(this.product, product)
-      }
-    })
+  beforeMount () {
+    this.$bus.$on('product-after-priceupdate', this.onProductPriceUpdate)
+  },
+  beforeDestroy () {
+    this.$bus.$off('product-after-priceupdate', this.onProductPriceUpdate)
   }
 }
 </script>
@@ -110,8 +145,35 @@ $border-secondary: color(secondary, $colors-border);
 $color-white: color(white);
 
 .product {
+  position: relative;
   @media (max-width: 767px) {
     padding-bottom: 10px;
+  }
+  &__icons {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    padding-right: 20px;
+    padding-top: 10px;
+  }
+  &__icon {
+    padding-top: 10px;
+    opacity: 0;
+    z-index: 2;
+    transition: 0.3s opacity $motion-main;
+    @media (max-width: 767px) {
+      opacity: 1;
+    }
+    &--active {
+      opacity: 1;
+    }
+  }
+  &:hover {
+    .product__icon {
+      opacity: 1;
+    }
   }
 }
 
@@ -134,44 +196,27 @@ $color-white: color(white);
   font-size: 12px;
 }
 
-.product-image {
-  width: 100%;
+.product-cover {
   overflow: hidden;
-  max-height: 300px;
 
-  &:hover {
-    img {
-      opacity: 1;
-      transform: scale(1.1);
+  &__thumb {
+    padding-bottom: calc(143.88% / (164.5 / 100));
+    @media screen and (min-width: 768px) {
+      padding-bottom: calc(300% / (276.5 / 100));
     }
-
-    &.sale::after,
-    &.new::after {
-      opacity: 0.8;
-    }
+    opacity: 0.8;
+    will-change: opacity, transform;
+    transition: 0.3s opacity $motion-main, 0.3s transform $motion-main;
   }
 
-  img {
-    max-height: 100%;
-    max-width: 100%;
-    width: auto;
-    height: auto;
-    margin: auto;
-    mix-blend-mode: darken;
-    opacity: 0.8;
-    transform: scale(1);
-    transition: 0.3s opacity $motion-main, 0.3s transform $motion-main;
-
-    &[lazy="loaded"] {
-      animation: products-loaded;
-      animation-duration: 0.3s;
-    }
-
-    @keyframes products-loaded {
-      from {
-        opacity: 0;
+  @media screen and (min-width: 768px) {
+    &:hover {
+      .product-cover__thumb {
+        opacity: 1;
+        transform: scale(1.1);
       }
-      to {
+      &.sale::after,
+      &.new::after {
         opacity: 0.8;
       }
     }
@@ -183,7 +228,6 @@ $color-white: color(white);
       content: 'Sale';
     }
   }
-
   &.new {
     &::after {
       @extend %label;

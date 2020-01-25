@@ -10,7 +10,7 @@
     <span
       class="minicart-count absolute flex center-xs middle-xs border-box py0 px2 h6 lh16 weight-700 cl-white bg-cl-silver"
       v-cloak
-      v-if="totalQuantity"
+      v-show="totalQuantity"
       data-testid="minicartCount"
     >
       {{ totalQuantity }}
@@ -19,10 +19,28 @@
 </template>
 
 <script>
-import MicrocartIcon from 'core/components/blocks/Header/MicrocartIcon'
+import { mapGetters, mapActions } from 'vuex'
+import MicrocartIcon from '@vue-storefront/core/compatibility/components/blocks/Header/MicrocartIcon'
 
 export default {
-  mixins: [MicrocartIcon]
+  // mixins: [MicrocartIcon],
+  mounted () {
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        this.$store.dispatch('cart/load')
+      }
+    })
+  },
+  computed: {
+    ...mapGetters({
+      totalQuantity: 'cart/getItemsTotalQuantity'
+    })
+  },
+  methods: {
+    ...mapActions({
+      openMicrocart: 'ui/toggleMicrocart'
+    })
+  }
 }
 </script>
 

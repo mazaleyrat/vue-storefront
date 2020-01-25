@@ -1,120 +1,130 @@
 <template>
   <div id="home">
-    <main-slider />
+    <head-image />
 
-    <promoted-offers/>
+    <promoted-offers />
 
     <section class="new-collection container px15">
       <div>
         <header class="col-md-12">
-          <h2 class="align-center cl-accent">{{ $t('Everything new') }}</h2>
+          <h2 class="align-center cl-accent">
+            {{ $t('Everything new') }}
+          </h2>
         </header>
       </div>
       <div class="row center-xs">
-        <product-listing columns="4" :products="everythingNewCollection" />
+        <lazy-hydrate :trigger-hydration="!loading" v-if="isLazyHydrateEnabled">
+          <product-listing columns="4" :products="getEverythingNewCollection" />
+        </lazy-hydrate>
+        <product-listing v-else columns="4" :products="getEverythingNewCollection" />
       </div>
     </section>
 
-    <collection :title="$t('New Luma Yoga Collection')" cover-image="/assets/collection.jpg" category="Women"/>
-
-    <section class="container pb60 px15">
+    <section v-if="isOnline" class="container pb60 px15">
       <div class="row center-xs">
-        <header class="col-md-12 pt40">
-          <h2 class="align-center cl-accent">{{ $t('Get inspired') }}</h2>
+        <header class="col-md-12" :class="{ pt40: getEverythingNewCollection && getEverythingNewCollection.length }">
+          <h2 class="align-center cl-accent">
+            {{ $t('Get inspired') }}
+          </h2>
         </header>
       </div>
       <tile-links />
     </section>
-    <Onboard/>
-
+    <Onboard />
   </div>
 </template>
 
 <script>
-// 3rd party dependecies
-import builder from 'bodybuilder'
-
-// Core dependecies
-import config from 'config'
+// query constructor
+import { isServer, onlineHelper } from '@vue-storefront/core/helpers'
+import LazyHydrate from 'vue-lazy-hydration'
 
 // Core pages
-import Home from 'core/pages/Home'
-
+import Home from '@vue-storefront/core/pages/Home'
 // Theme core components
 import ProductListing from 'theme/components/core/ProductListing'
-import MainSlider from 'theme/components/core/blocks/MainSlider/MainSlider'
-
+import HeadImage from 'theme/components/core/blocks/MainSlider/HeadImage'
 // Theme local components
-import Collection from 'theme/components/theme/blocks/Collection/Collection'
 import Onboard from 'theme/components/theme/blocks/Home/Onboard'
 import PromotedOffers from 'theme/components/theme/blocks/PromotedOffers/PromotedOffers'
 import TileLinks from 'theme/components/theme/blocks/TileLinks/TileLinks'
+import {Logger} from '@vue-storefront/core/lib/logger'
+import {mapGetters} from 'vuex'
+import config from 'config'
+import {registerModule} from '@vue-storefront/core/lib/modules'
+import {RecentlyViewedModule} from '@vue-storefront/core/modules/recently-viewed'
 
 export default {
+  data () {
+    return {
+      loading: true
+    }
+  },
   mixins: [Home],
   components: {
-    Collection,
-    MainSlider,
+    HeadImage,
     Onboard,
     ProductListing,
     PromotedOffers,
-    TileLinks
+    TileLinks,
+    LazyHydrate
   },
   computed: {
+    ...mapGetters('user', ['isLoggedIn']),
+    ...mapGetters('homepage', ['getEverythingNewCollection']),
     categories () {
-      return this.$store.state.category.list
+      return this.getCategories
     },
-    everythingNewCollection () {
-      return this.$store.state.homepage.new_collection
+    isOnline () {
+      return onlineHelper.isOnline
     },
-    coolBagsCollection () {
-      return this.$store.state.homepage.coolbags_collection
+    isLazyHydrateEnabled () {
+      return config.ssr.lazyHydrateFor.some(
+        field => ['homepage', 'homepage.new_collection'].includes(field)
+      )
     }
   },
-  created () {
-    // Load personal and shipping details for Checkout page from IndexedDB
-    this.$store.dispatch('checkout/load')
+  beforeCreate () {
+    registerModule(RecentlyViewedModule)
   },
-  beforeMount () {
-    if (global.$VS.__DEMO_MODE__) {
-      this.$store.dispatch('claims/check', { claimCode: 'onboardingAccepted' }).then((onboardingClaim) => {
-        if (!onboardingClaim) { // show onboarding info
-          this.$bus.$emit('modal-toggle', 'modal-onboard')
-          this.$store.dispatch('claims/set', { claimCode: 'onboardingAccepted', value: true })
-        }
-      })
+  async beforeMount () {
+    if (this.$store.state.__DEMO_MODE__) {
+      const onboardingClaim = await this.$store.dispatch('claims/check', { claimCode: 'onboardingAccepted' })
+      if (!onboardingClaim) { // show onboarding info
+        this.$bus.$emit('modal-toggle', 'modal-onboard')
+        this.$store.dispatch('claims/set', { claimCode: 'onboardingAccepted', value: true })
+      }
     }
   },
-  asyncData ({ store, route }) { // this is for SSR purposes to prefetch data
-    return new Promise((resolve, reject) => {
-      console.log('Entering asyncData for Home ' + new Date())
-      let newProductsQuery = builder().query('match', 'category.name', 'Tees').andFilter('range', 'visibility', { 'gte': 2, 'lte': 4 }/** Magento visibility in search & categories */).build()
-      let coolBagsQuery = builder().query('match', 'category.name', 'Women').andFilter('range', 'visibility', { 'gte': 2, 'lte': 4 }/** Magento visibility in search & categories */).build()
-      store.dispatch('category/list', { includeFields: config.entities.optimize ? config.entities.category.includeFields : null }).then((categories) => {
-        store.dispatch('product/list', {
-          query: newProductsQuery,
-          size: 8,
-          sort: 'created_at:desc',
-          includeFields: config.entities.optimize ? config.entities.productList.includeFields : []
-        }).then(function (res) {
-          if (res) {
-            store.state.homepage.new_collection = res.items
-          }
+  mounted () {
+    if (!this.isLoggedIn && localStorage.getItem('redirect')) this.$bus.$emit('modal-show', 'modal-signup')
+  },
+  watch: {
+    isLoggedIn () {
+      const redirectObj = localStorage.getItem('redirect')
+      if (redirectObj) this.$router.push(redirectObj)
+      localStorage.removeItem('redirect')
+    }
+  },
+  async asyncData ({ store, route }) { // this is for SSR purposes to prefetch data
+    Logger.info('Calling asyncData in Home (theme)')()
 
-          store.dispatch('product/list', {
-            query: coolBagsQuery,
-            size: 4,
-            sort: 'created_at:desc',
-            includeFields: config.entities.optimize ? config.entities.productList.includeFields : []
-          }).then(function (res) {
-            if (res) {
-              store.state.homepage.coolbags_collection = res.items
-            }
-            return resolve()
-          })
+    await Promise.all([
+      store.dispatch('homepage/fetchNewCollection'),
+      store.dispatch('promoted/updateHeadImage'),
+      store.dispatch('promoted/updatePromotedOffers')
+    ])
+  },
+  beforeRouteEnter (to, from, next) {
+    if (!isServer && !from.name) { // Loading products to cache on SSR render
+      next(vm =>
+        vm.$store.dispatch('homepage/fetchNewCollection').then(res => {
+          vm.loading = false
         })
-      })
-    })
+      )
+    } else {
+      next()
+    }
   }
 }
 </script>

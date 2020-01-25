@@ -2,7 +2,7 @@
   <div class="compare">
     <div class="bg-cl-secondary py35 pl20">
       <div class="container">
-        <breadcrumbs :routes="[{name: 'Homepage', route_link: '/'}]" active-route="Compare"/>
+        <breadcrumbs :with-homepage="true" :routes="[]" active-route="Compare" />
         <h2>{{ title }}</h2>
       </div>
     </div>
@@ -15,26 +15,28 @@
                 {{ $t('Products') }}
               </div>
               <ul class="compare__features-list">
-                <li class="compare__features-item">{{ $t('SKU') }}</li>
-                <li v-for="(attr, index) in all_comparable_attributes" :key="index" class="compare__features-item">
+                <li
+                  v-for="(attr, index) in all_comparable_attributes"
+                  :key="index"
+                  class="compare__features-item"
+                >
                   {{ attr.default_frontend_label }}
                 </li>
               </ul>
             </div>
             <div class="compare__products-wrapper">
               <ul class="compare__products-columns">
-                <li v-for="(product, index) in items" :key="index" class="compare__product" data-testid="comparedProduct">
+                <li
+                  v-for="(product, index) in items"
+                  :key="index"
+                  class="compare__product"
+                  data-testid="comparedProduct"
+                >
                   <div class="compare__top-info">
-                    <div class="check"/>
-                    <product-tile class="col-md-12 collection-product" :product="product"/>
-                    <span class="compare__remove" @click="removeFromCompare(product)">
-                      <remove-button/>
-                    </span>
+                    <div class="check" />
+                    <product-tile class="col-md-12 collection-product" :product="product" />
                   </div>
                   <ul class="compare__features-list">
-                    <li class="compare__features-item">
-                      {{ product.sku }}
-                    </li>
                     <li
                       v-for="(attr, attIndex) in all_comparable_attributes"
                       :key="attIndex"
@@ -68,20 +70,33 @@
 </template>
 
 <script>
-import Compare from 'core/pages/Compare'
+import Compare from '@vue-storefront/core/pages/Compare'
 import Breadcrumbs from '../components/core/Breadcrumbs'
-import RemoveButton from '../components/core/blocks/Compare/RemoveButton'
 import ProductTile from '../components/core/ProductTile'
 import ProductAttribute from '../components/core/blocks/Compare/ProductAttribute'
+import i18n from '@vue-storefront/i18n'
 
 export default {
   components: {
     Breadcrumbs,
     ProductTile,
-    RemoveButton,
     ProductAttribute
   },
-  mixins: [Compare]
+  mixins: [Compare],
+  props: {
+    title: {
+      type: String,
+      required: true
+    }
+  },
+  metaInfo () {
+    return {
+      title: this.$route.meta.title || this.title || i18n.t('Compare Products'),
+      meta: this.$route.meta.description
+        ? [{ vmid: 'description', description: this.$route.meta.description }]
+        : []
+    }
+  }
 }
 </script>
 
@@ -107,7 +122,6 @@ $screen-l: 1170px;
 }
 
 .compare {
-
   &__products-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -141,7 +155,7 @@ $screen-l: 1170px;
     border-color: $border;
     border-width: 1px 0 1px 0;
     background-color: mix(#000, $color-white, 2%);
-    opacity: .95;
+    opacity: 0.95;
 
     @media (min-width: $screen-l) {
       width: $features-column-width;
@@ -154,7 +168,7 @@ $screen-l: 1170px;
     float: left;
     width: $products-column-width-mobile;
     text-align: center;
-    transition: opacity .3s, visibility .3s, transform .3s;
+    transition: opacity 0.3s, visibility 0.3s, transform 0.3s;
 
     @media (min-width: $screen-l) {
       width: $products-column-width;
@@ -183,7 +197,7 @@ $screen-l: 1170px;
     border-color: $border;
     border-style: solid;
     border-width: 0 1px 0 0;
-    transition: height .3s;
+    transition: height 0.3s;
     cursor: pointer;
     background: $color-product-bg;
     overflow: hidden;

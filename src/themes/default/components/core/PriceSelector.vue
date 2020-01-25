@@ -1,21 +1,21 @@
 <template>
-  <span @click="switchFilter(id, from, to)">
+  <div @click="$emit('change', variant)">
     <button
       class="relative brdr-cl-bg-tertiary brdr-1 bg-cl-transparent mr10 pointer price-selector"
-      :class="{ active: active }"
-      :aria-label="$t('Price ') + content"
+      :class="{ active: isActive }"
+      :aria-label="$t('Price {variant}', { variant: variant.label })"
     >
-      <div class="bg-cl-transparent absolute block square"/>
+      <span class="bg-cl-transparent absolute block square" />
     </button>
-    <span>{{ content }}</span>
-  </span>
+    <span>{{ variant.label }}</span>
+  </div>
 </template>
 
 <script>
-import PriceSelector from 'core/components/PriceSelector'
+import filterMixin from 'theme/mixins/filterMixin.ts'
 
 export default {
-  mixins: [PriceSelector]
+  mixins: [filterMixin]
 }
 </script>
 
